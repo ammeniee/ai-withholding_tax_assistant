@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#123b63">
+  <title>AI Withholding Tax Assistant - ผู้ช่วยวิเคราะห์ภาษีหัก ณ ที่จ่าย</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">AC317 • ACCOUNTING PROJECT</div>
+    <h1>AI Withholding Tax Assistant</h1>
+    <p>เครื่องมือช่วยวิเคราะห์ภาษีเงินได้หัก ณ ที่จ่ายตามหลักเกณฑ์ภาษีไทย</p>
+    <div class="hero-note">Prototype เพื่อการศึกษา • ไม่ใช่คำวินิจฉัยหรือคำแนะนำทางกฎหมาย</div>
+  </div>
+</header>
+
+<main class="container">
+  <nav class="tabs" aria-label="เมนูหลัก">
+    <button class="tab active" data-tab="calculator">คำนวณภาษี</button>
+    <button class="tab" data-tab="tests">กรณีทดสอบ 10 กรณี</button>
+    <button class="tab" data-tab="laws">ข้อกฎหมายและแหล่งอ้างอิง</button>
+    <button class="tab" data-tab="about">เกี่ยวกับโครงงาน</button>
+  </nav>
+
+  <section id="calculator" class="panel active">
+    <div class="section-heading">
+      <div><span class="kicker">ANALYSIS WORKFLOW</span><h2>วิเคราะห์รายการจ่าย</h2></div>
+      <span class="pill">กรอกข้อมูลให้ครบก่อนคำนวณ</span>
+    </div>
+    <div class="workflow">
+      <span>1 ตรวจข้อมูล</span><i>→</i><span>2 จำแนกธุรกรรม</span><i>→</i><span>3 ตรวจผู้จ่าย/ผู้รับ</span><i>→</i><span>4 คำนวณ</span><i>→</i><span>5 อธิบายกฎหมาย</span>
+    </div>
+    <form id="taxForm" class="form-grid">
+      <label>วันที่จ่ายเงิน<input type="date" id="paymentDate" value="2026-11-20" required></label>
+      <label>ผู้จ่ายเงิน
+        <select id="payerType" required>
+          <option value="company">บริษัท/ห้างหุ้นส่วนนิติบุคคล/นิติบุคคลอื่น</option>
+          <option value="individual">บุคคลธรรมดา</option>
+          <option value="government">หน่วยงานรัฐ</option>
+          <option value="unknown">ไม่ทราบ/อื่น ๆ</option>
+        </select>
+      </label>
+      <label>ผู้รับเงิน
+        <select id="recipientType" required>
+          <option value="company">บริษัท/ห้างหุ้นส่วนนิติบุคคลในประเทศไทย</option>
+          <option value="individual">บุคคลธรรมดา</option>
+          <option value="foundation">มูลนิธิ/สมาคม</option>
+          <option value="foreign">ผู้รับต่างประเทศ</option>
+          <option value="unknown">ไม่ทราบ</option>
+        </select>
+      </label>
+      <label>ลักษณะรายการจ่าย
+        <select id="category" required>
+          <option value="">-- เลือกประเภทธุรกรรม --</option>
+          <option value="rent">ค่าเช่าทรัพย์สิน</option>
+          <option value="hire">ค่าจ้างทำของ</option>
+          <option value="service">ค่าบริการทั่วไป</option>
+          <option value="advertising">ค่าโฆษณา</option>
+          <option value="transport">ค่าขนส่งสินค้า</option>
+          <option value="commission">ค่านายหน้า/ค่าธรรมเนียม</option>
+          <option value="professional">ค่าวิชาชีพอิสระ</option>
+          <option value="goods">ค่าสินค้าทั่วไป</option>
+          <option value="hotel">ค่าบริการโรงแรม/ภัตตาคาร</option>
+          <option value="unclear">ยังจำแนกไม่ได้/รายการผสม</option>
+        </select>
+      </label>
+      <label>จำนวนเงินก่อน VAT (บาท)<input type="number" id="amount" min="0" step="0.01" placeholder="เช่น 30000" required></label>
+      <label>VAT (บาท)<input type="number" id="vat" min="0" step="0.01" value="0"></label>
+      <label class="wide">รายละเอียด/เงื่อนไขสัญญา<textarea id="description" rows="3" placeholder="เช่น เช่าสำนักงานรายเดือน มีสัญญาเช่า ผู้รับเป็นบริษัทในประเทศไทย"></textarea></label>
+      <label class="check wide"><input type="checkbox" id="contractOver1000"> สัญญารายหนึ่งมีมูลค่าตั้งแต่ 1,000 บาทขึ้นไป (รวมกรณีแบ่งจ่าย)</label>
+      <div class="form-actions wide">
+        <button class="primary" type="submit">วิเคราะห์และคำนวณ</button>
+        <button class="secondary" type="reset" id="resetBtn">ล้างข้อมูล</button>
+      </div>
+    </form>
+    <div id="result" class="result hidden" aria-live="polite"></div>
+  </section>
+
+  <section id="tests" class="panel">
+    <div class="section-heading">
+      <div><span class="kicker">DEMO SCENARIOS</span><h2>กรณีทดสอบ 10 กรณี</h2></div>
+      <p class="muted">เลือก “ดูผลตัวอย่าง” เพื่อทดลองเติมข้อมูลในแบบฟอร์ม</p>
+    </div>
+    <div id="testCases" class="case-grid"></div>
+  </section>
+
+  <section id="laws" class="panel">
+    <div class="section-heading"><div><span class="kicker">LEGAL REFERENCES</span><h2>ข้อกฎหมายและหลักเกณฑ์</h2></div></div>
+    <div class="warning">
+      <strong>ข้อควรระวัง</strong>
+      <p>อัตราด้านล่างเป็นแนวทางตัวอย่างสำหรับการศึกษา ไม่ใช่ตารางอัตราที่ใช้ได้กับทุกกรณี ต้องตรวจประเภทเงินได้ ผู้จ่าย ผู้รับ ถิ่นที่อยู่ สัญญา ข้อยกเว้น และคำสั่งที่แก้ไขเพิ่มเติม ณ วันที่จ่ายเงินจริงทุกครั้ง</p>
+    </div>
+    <div class="law-list">
+      <article class="law-card"><h3>ประมวลรัษฎากร มาตรา 3 เตรส</h3><p>เป็นฐานอำนาจในการกำหนดให้ผู้จ่ายเงินได้บางประเภทมีหน้าที่หักภาษี ณ ที่จ่ายตามหลักเกณฑ์ที่กำหนด</p></article>
+      <article class="law-card"><h3>ประมวลรัษฎากร มาตรา 40</h3><p>ใช้จำแนกประเภทเงินได้พึงประเมิน เช่น มาตรา 40(2) ค่าตอบแทนจากการรับทำงานให้, 40(5) ค่าเช่า, 40(6) วิชาชีพอิสระ และ 40(7)/(8) ค่าจ้างทำของหรือธุรกิจ/บริการบางประเภท</p></article>
+      <article class="law-card"><h3>คำสั่งกรมสรรพากรที่ ท.ป. 4/2528 และที่แก้ไขเพิ่มเติม</h3><p>กำหนดหลักเกณฑ์และอัตราหักภาษี ณ ที่จ่ายในหลายประเภท เช่น ค่าเช่าโดยทั่วไป 5%, ค่าจ้างทำของ 3%, ค่าโฆษณา 2% และประเภทอื่นตามเงื่อนไขของแต่ละข้อ</p><a href="https://www.rd.go.th/3479.html" target="_blank" rel="noopener">อ่านคำสั่ง ท.ป.4/2528 จากกรมสรรพากร ↗</a></article>
+      <article class="law-card"><h3>คำสั่งกรมสรรพากรที่ ท.ป. 104/2544</h3><p>แก้ไขหลักเกณฑ์บริการอื่นตามข้อ 12/1 (โดยทั่วไป 3% สำหรับผู้รับตามเงื่อนไข) และค่าขนส่งตามข้อ 12/4 (1% โดยไม่รวมค่าโดยสารขนส่งสาธารณะ) รวมทั้งเกณฑ์สัญญาตั้งแต่ 1,000 บาทตามข้อ 12/5</p><a href="https://www.rd.go.th/3291.html" target="_blank" rel="noopener">อ่านคำสั่ง ท.ป.104/2544 จากกรมสรรพากร ↗</a></article>
+      <article class="law-card"><h3>คำสั่งกรมสรรพากรที่ ป. 6/2528</h3><p>คำชี้แจงกรณีจ่ายค่าโฆษณา โดยทั่วไปหัก 2% ตามข้อเท็จจริงและเงื่อนไขที่ระบุ</p><a href="https://www.rd.go.th/3617.html" target="_blank" rel="noopener">อ่านคำสั่ง ป.6/2528 จากกรมสรรพากร ↗</a></article>
+      <article class="law-card"><h3>ภ.ง.ด.3 และ ภ.ง.ด.53</h3><p>โดยหลักใช้แบบ ภ.ง.ด.3 เมื่อจ่ายให้บุคคลธรรมดา และ ภ.ง.ด.53 เมื่อจ่ายให้บริษัท/ห้างหุ้นส่วนนิติบุคคล ทั้งนี้ต้องตรวจแบบและข้อกำหนดตามผู้รับจริง</p><a href="https://www.rd.go.th/" target="_blank" rel="noopener">เว็บไซต์กรมสรรพากร ↗</a></article>
+    </div>
+    <p class="muted small">แหล่งข้อมูลอ้างอิงหลัก: เว็บไซต์กรมสรรพากร (Revenue Department) • ควรเปิดตรวจฉบับปัจจุบันและประกาศ/คำสั่งแก้ไขเพิ่มเติมก่อนใช้งานจริง</p>
+  </section>
+
+  <section id="about" class="panel">
+    <div class="section-heading"><div><span class="kicker">PROJECT INFORMATION</span><h2>เกี่ยวกับโครงงาน</h2></div></div>
+    <div class="about-card">
+      <h3>AI Withholding Tax Assistant - Group XX</h3>
+      <p>เว็บต้นแบบสำหรับงาน AC317 การบัญชีภาษีอากร ช่วยรวบรวมข้อเท็จจริง จำแนกธุรกรรม แสดงแนวทางคำนวณ และเชื่อมโยงแหล่งกฎหมายที่เกี่ยวข้อง</p>
+      <h3>สมาชิกกลุ่ม</h3>
+      <ol>
+        <li>2410211100159 น.ส.ปพิชญา หนูนุ่น</li>
+        <li>2410211100168 น.ส.ศุภารมย์ ขันตะคุ</li>
+        <li>2410211100176 น.ส.ประภัศรา เหมือนสุวรรณ์</li>
+        <li>2410211100189 น.ส.นิชาภัทร สินชัย</li>
+      </ol>
+      <h3>วิธีทำงาน</h3>
+      <p>ตรวจข้อมูล → จำแนกลักษณะธุรกรรม → ตรวจเงื่อนไขผู้จ่าย/ผู้รับ → คำนวณภาษี → อธิบายข้อกฎหมาย → ส่งต่อผู้เชี่ยวชาญเมื่อข้อมูลไม่ครบ</p>
+    </div>
+  </section>
+</main>
+<footer>AI Withholding Tax Assistant • Educational prototype • ตรวจสอบกฎหมายฉบับล่าสุดก่อนใช้งานจริง</footer>
+<script src="app.js"></script>
+</body>
+</html>
